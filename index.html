@@ -1,307 +1,373 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>STAR FAN OFFICIAL — Crew Member Golden Tour</title>
-<style>
-  :root{--bg:#081022;--card:#0f1724;--accent:#ff3b30;--accent2:#ff9a3c;--muted:#9fb0c6}
-  *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Roboto,-apple-system,Segoe UI,Arial;background:linear-gradient(180deg,#061428,#041025);color:#e6f0f8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-  .container{width:100%;max-width:920px}
-  .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:22px;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.6)}
-  .center{display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center}
-  .logo{font-weight:800;font-size:22px;color:var(--accent)}
-  h1{margin:8px 0 6px;font-size:22px}
-  h2{margin:6px 0 10px;font-size:16px;color:var(--muted)}
-  button{background:var(--accent);border:none;color:#071017;padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer}
-  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
-  .row{display:flex;gap:10px}
-  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
-  label{font-size:13px;color:var(--muted)}
-  input[type="text"], input[type="email"], input[type="number"], select, textarea, input[type="file"]{
-    width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit
-  }
-  .full{grid-column:1 / -1}
-  .small{font-size:13px;color:var(--muted)}
-  .overlay{position:fixed;inset:0;background:rgba(2,8,18,0.6);display:none;align-items:center;justify-content:center;padding:20px;z-index:40}
-  .modal{background:#041428;padding:18px;border-radius:12px;max-width:720px;width:100%}
-  .close{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:6px 10px;border-radius:8px;color:var(--muted)}
-  .checkbox{display:flex;gap:8px;align-items:center}
-  .final-note{margin-top:12px;color:var(--muted);font-size:13px}
-  @media (max-width:760px){.form-grid{grid-template-columns:1fr}.row{flex-direction:column}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STAR FAN OFFICIAL - Crew Member Tour Reservation</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #EF4444; /* Tailwind red-500 */
+            --secondary-color: #1F2937; /* Tailwind gray-800 */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .main-card {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .file-upload-label {
+            display: block;
+            cursor: pointer;
+            padding: 0.75rem 1.25rem;
+            border: 2px dashed #9ca3af; /* gray-400 */
+            border-radius: 0.5rem;
+            text-align: center;
+            color: #6b7280; /* gray-500 */
+            transition: all 0.2s;
+        }
+        .file-upload-label:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        .file-upload-input:focus + .file-upload-label {
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.5); /* Focus ring */
+        }
+        /* Style for the brief success message overlay */
+        #transientMessage {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none; /* Allows clicks to pass through when hidden */
+        }
+        #transientMessage.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Responsive adjustments for mobile */
+        @media (max-width: 640px) {
+            .main-card {
+                padding: 1rem;
+                margin: 1rem;
+            }
+        }
+
+        /* Basic form input styling for consistency */
+        input[type="text"], input[type="number"], input[type="file"] {
+            border: 1px solid #d1d5db; /* gray-300 */
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            width: 100%;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        input[type="text"]:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 1px var(--primary-color);
+        }
+
+    </style>
 </head>
-<body>
-  <div class="container">
-    <!-- FAST WELCOME LANDING (appears first, then transitions quickly to the main flow) -->
-    <div id="landing" class="card center">
-      <div class="logo">STAR FAN OFFICIAL</div>
-      <h1>Welcome</h1>
-      <h2>Crew member golden tour reservations</h2>
-      <p class="small">Welcome! This demo will take you to the registration form shortly. (Click Continue to open it immediately.)</p>
-      <div style="height:12px"></div>
-      <div class="row" style="justify-content:center">
-        <button id="landingContinue">Continue</button>
-        <button id="landingSkip" class="ghost">Skip intro</button>
-      </div>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Global container for all pages -->
+    <div id="appContainer" class="w-full max-w-lg mx-auto">
+
+        <!-- STAR FAN OFFICIAL Header (Always Visible) -->
+        <header class="text-center mb-8">
+            <h1 class="text-5xl font-extrabold text-gray-900 leading-tight">STAR FAN OFFICIAL</h1>
+            <h2 class="text-xl font-medium text-gray-600 mt-2">Crew Member Golden Tour Reservations</h2>
+        </header>
+
+        <!-- Dynamic Content Card -->
+        <div id="contentCard" class="main-card bg-white rounded-xl p-8 w-full">
+
+            <!-- --------------------------------- -->
+            <!-- PAGE 0: WELCOME LANDING PAGE -->
+            <!-- --------------------------------- -->
+            <div id="welcomeScreen" class="text-center">
+                <p class="text-3xl font-bold text-gray-800">Welcome to the Tour Reservation Portal</p>
+                <p class="mt-4 text-gray-500">Preparing your reservation form...</p>
+                <div class="mt-8 flex justify-center">
+                    <!-- Simple loading spinner -->
+                    <svg class="animate-spin h-8 w-8 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+            </div>
+
+
+            <!-- --------------------------------- -->
+            <!-- PAGE 1: RESERVATION FORM -->
+            <!-- --------------------------------- -->
+            <form id="reservationForm" class="hidden space-y-4" onsubmit="handleSubmitPage1(event)">
+                <p class="text-lg font-semibold text-gray-700">Kindly provide the details below.</p>
+
+                <!-- Personal Info -->
+                <div><label for="surname" class="block text-sm font-medium text-gray-700">Surname:</label><input type="text" id="surname" required></div>
+                <div><label for="firstName" class="block text-sm font-medium text-gray-700">First Name:</label><input type="text" id="firstName" required></div>
+                <div><label for="otherName" class="block text-sm font-medium text-gray-700">Other Name:</label><input type="text" id="otherName"></div>
+                <div><label for="age" class="block text-sm font-medium text-gray-700">Age:</label><input type="number" id="age" required min="18" max="120"></div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Gender:</label>
+                    <select id="gender" class="block w-full rounded-md border-gray-300 shadow-sm p-2" required>
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div><label for="stateOrigin" class="block text-sm font-medium text-gray-700">State of Origin:</label><input type="text" id="stateOrigin" required></div>
+                <div><label for="address" class="block text-sm font-medium text-gray-700">Residential Address:</label><input type="text" id="address" required></div>
+                <div><label for="ssn" class="block text-sm font-medium text-gray-700">SSN/NI (Number):</label><input type="text" id="ssn" required></div>
+
+                <!-- Document Uploads -->
+                <div class="pt-4 border-t border-gray-200 space-y-4">
+                    <p class="text-base font-semibold text-gray-700">Document Uploads</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="idPhoto" class="block text-sm font-medium text-gray-700 mb-1">ID (Driver's License / Int. Passport Photo)</label>
+                            <input type="file" id="idPhoto" class="file-upload-input hidden" accept="image/*" required>
+                            <label for="idPhoto" class="file-upload-label" data-text="Upload ID Photo">Upload ID Photo</label>
+                        </div>
+                        <div>
+                            <label for="starCardPhoto" class="block text-sm font-medium text-gray-700 mb-1">Star Fan Card Photo</label>
+                            <input type="file" id="starCardPhoto" class="file-upload-input hidden" accept="image/*" required>
+                            <label for="starCardPhoto" class="file-upload-label" data-text="Upload Star Card Photo">Upload Star Card Photo</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="correspondencePhoto" class="block text-sm font-medium text-gray-700 mb-1">Proof of Correspondence Photo</label>
+                        <input type="file" id="correspondencePhoto" class="file-upload-input hidden" accept="image/*" required>
+                        <label for="correspondencePhoto" class="file-upload-label" data-text="Upload Correspondence Photo">Upload Correspondence Photo</label>
+                    </div>
+                </div>
+
+                <!-- Agreement Checkbox -->
+                <div class="pt-4 flex items-start">
+                    <input id="agreement" type="checkbox" required class="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500 mt-1">
+                    <label for="agreement" class="ml-2 text-sm text-gray-900 select-none">
+                        I agree that the details provided above are mine and are accurate.
+                    </label>
+                </div>
+
+                <!-- SUBMIT Button -->
+                <button type="submit" class="w-full mt-6 flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150">
+                    SUBMIT 👇
+                </button>
+            </form>
+
+
+            <!-- --------------------------------- -->
+            <!-- PAGE 2: PAYMENT / SCHEDULE ACCESS -->
+            <!-- --------------------------------- -->
+            <div id="paymentPage" class="hidden text-center space-y-6">
+                <h1 class="text-3xl font-bold text-green-600">Congratulations, your registration is Successful!</h1>
+                <h2 class="text-xl text-gray-700 font-semibold">Kindly proceed to access the tour schedule.</h2>
+
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 text-left space-y-3">
+                    <p class="text-lg font-bold text-red-600">Access Fee: <span class="text-2xl">$162</span></p>
+                    <p class="text-sm font-medium text-gray-700">Make payment to this Bitcoin Address:</p>
+                    <div class="relative">
+                        <code id="bitcoinAddress" class="block bg-white p-3 rounded-lg border border-red-300 text-gray-900 break-all select-all font-mono text-sm">
+                            bc1q02096qxd0z3t0swqva6vyl8wauwa66crx2sk5v
+                        </code>
+                        <button onclick="copyBitcoinAddress()" class="absolute top-1 right-1 p-1 text-xs bg-red-100 text-red-600 rounded hover:bg-red-200 transition">
+                            Copy
+                        </button>
+                        <p id="copyMessage" class="hidden text-xs text-green-600 mt-1">Copied!</p>
+                    </div>
+                </div>
+
+                <form onsubmit="handleSubmitPage2(event)" class="space-y-4 pt-4">
+                    <!-- Receipt Upload -->
+                    <div>
+                        <label for="paymentReceipt" class="block text-sm font-medium text-gray-700 mb-1">Provide Payment Receipt (Photo)</label>
+                        <input type="file" id="paymentReceipt" class="file-upload-input hidden" accept="image/*" required>
+                        <label for="paymentReceipt" class="file-upload-label" data-text="Upload Payment Receipt">Upload Payment Receipt</label>
+                    </div>
+
+                    <!-- CONFIRM Button -->
+                    <button type="submit" class="w-full mt-6 py-3 px-4 rounded-lg shadow-lg text-lg font-bold text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150">
+                        CONFIRM
+                    </button>
+                </form>
+            </div>
+
+            <!-- --------------------------------- -->
+            <!-- PAGE 3: FINAL CONFIRMATION -->
+            <!-- --------------------------------- -->
+            <div id="finalConfirmation" class="hidden text-center p-8">
+                <h1 class="text-4xl font-extrabold text-green-600 mb-4">CONGRATULATIONS!</h1>
+                <p class="text-lg text-gray-700">Kindly check your email for your access details and tour schedule.</p>
+                <p class="mt-8 text-sm text-gray-500">Thank you for your reservation.</p>
+            </div>
+
+        </div> <!-- End of Dynamic Content Card -->
+
+        <!-- --------------------------------- -->
+        <!-- TRANSIENT SUCCESS MESSAGE OVERLAY -->
+        <!-- --------------------------------- -->
+        <div id="transientMessage" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-70 z-50">
+            <div class="bg-white p-8 rounded-xl text-center shadow-2xl animate-pulse">
+                <p class="text-2xl font-bold text-green-600">Congratulations!</p>
+                <p class="text-gray-700 mt-2">Your details have been submitted successfully.</p>
+            </div>
+        </div>
+
+        <!-- --------------------------------- -->
+        <!-- FOOTER -->
+        <!-- --------------------------------- -->
+        <footer class="text-center mt-8 text-gray-500 text-xs space-y-1">
+            <p>Starfantvs.co</p>
+            <p>Tvscrew##2025</p>
+        </footer>
+
     </div>
 
-    <!-- MAIN FORM PAGE (hidden at start) -->
-    <div id="mainPage" class="card" style="display:none;margin-top:16px">
-      <div class="center">
-        <div class="logo">STAR FAN OFFICIAL</div>
-        <h1>STAR FAN OFFICIAL</h1>
-        <h2>Crew member golden tour reservations</h2>
-        <p class="small">Kindly provide the details below. <strong>For school demo use mock/test values only — do NOT submit real SSN or official ID images.</strong></p>
-      </div>
+    <script>
+        // --- JavaScript Logic ---
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const reservationForm = document.getElementById('reservationForm');
+        const paymentPage = document.getElementById('paymentPage');
+        const finalConfirmation = document.getElementById('finalConfirmation');
+        const transientMessage = document.getElementById('transientMessage');
+        const pages = [welcomeScreen, reservationForm, paymentPage, finalConfirmation];
 
-      <form id="regForm" style="margin-top:12px">
-        <div class="form-grid">
-          <div>
-            <label>Surname:</label>
-            <input name="surname" type="text" required />
-          </div>
-          <div>
-            <label>First Name:</label>
-            <input name="firstname" type="text" required />
-          </div>
+        let currentPage = 0; // 0: Welcome, 1: Form, 2: Payment, 3: Final
 
-          <div>
-            <label>Other Name:</label>
-            <input name="othername" type="text" />
-          </div>
-          <div>
-            <label>Age:</label>
-            <input name="age" type="number" min="0" />
-          </div>
+        /**
+         * Hides all content pages and shows the one corresponding to the new step.
+         * @param {number} step - The index of the page to show.
+         */
+        function showPage(step) {
+            currentPage = step;
+            pages.forEach((page, index) => {
+                if (index === step) {
+                    page.classList.remove('hidden');
+                } else {
+                    page.classList.add('hidden');
+                }
+            });
+            // Scroll to top of the card when changing pages for better UX
+            document.getElementById('contentCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
 
-          <div>
-            <label>Gender:</label>
-            <select name="gender">
-              <option value="">Select</option>
-              <option>Male</option>
-              <option>Female</option>
-              <option>Prefer not to say</option>
-            </select>
-          </div>
-          <div>
-            <label>State of Origin:</label>
-            <input name="state" type="text" />
-          </div>
+        /**
+         * Handles the quick transition from the Welcome Screen to the Main Form (Page 1).
+         */
+        window.onload = function() {
+            // Give a very brief moment before transitioning, as requested, but make it fast.
+            setTimeout(() => {
+                showPage(1); // Go straight to the reservation form
+            }, 300); // 300ms transition for fast loading
+        };
 
-          <div class="full">
-            <label>Residential Address:</label>
-            <input name="address" type="text" />
-          </div>
+        /**
+         * Updates the file input label to show the selected file name.
+         */
+        document.querySelectorAll('.file-upload-input').forEach(input => {
+            input.addEventListener('change', function() {
+                const label = this.nextElementSibling;
+                if (this.files && this.files.length > 0) {
+                    label.textContent = `File Selected: ${this.files[0].name}`;
+                    label.classList.add('bg-green-50', 'border-green-400');
+                    label.classList.remove('bg-white', 'border-gray-400');
+                } else {
+                    label.textContent = label.getAttribute('data-text');
+                    label.classList.remove('bg-green-50', 'border-green-400');
+                    label.classList.add('bg-white', 'border-gray-400');
+                }
+            });
+        });
 
-          <!-- Sensitive fields replaced with clear demo warnings -->
-          <div>
-            <label>ID (drivers license / international passport) photo</label>
-            <input name="id_photo" type="file" accept="image/*" />
-            <div class="small">Demo only — do NOT upload real government ID for this school project.</div>
-          </div>
-          <div>
-            <label>SSN / NIN (number)</label>
-            <input name="ssn" type="text" placeholder="Use mock/test number — do NOT use real SSN/NIN" />
-            <div class="small">Use dummy values like 123456789 for the demo.</div>
-          </div>
 
-          <div>
-            <label>Star Fan Card: photo</label>
-            <input name="card_photo" type="file" accept="image/*" />
-            <div class="small">Optional — mock image only.</div>
-          </div>
-          <div>
-            <label>Proof of Correspondence: photo</label>
-            <input name="proof_photo" type="file" accept="image/*" />
-            <div class="small">Optional — mock image only.</div>
-          </div>
+        /**
+         * Step 1: Handle submission of the main reservation form.
+         * @param {Event} e - The form submission event.
+         */
+        function handleSubmitPage1(e) {
+            e.preventDefault();
 
-          <div class="full">
-            <label class="checkbox"><input id="agree" type="checkbox" required /> <span>I agree that the details provided above are mine and are accurate.</span></label>
-          </div>
+            // 1. Show transient success message
+            transientMessage.classList.add('show');
 
-          <div class="full" style="display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:6px">
-            <div class="small">Footer: Starfantvs.co</div>
-            <div class="small">Code: Tvscrew##2025</div>
-          </div>
+            // Simulate data collection (in a real app, this would be an API call)
+            const formData = {
+                surname: document.getElementById('surname').value,
+                firstName: document.getElementById('firstName').value,
+                age: document.getElementById('age').value,
+                // ... other fields
+                // Note: File contents cannot be easily logged, only their names/types
+                idPhoto: document.getElementById('idPhoto').files[0]?.name,
+            };
+            console.log('Reservation Form Submitted (Simulated)', formData);
 
-        </div>
+            // 2. Hide transient message and proceed to Payment Page
+            // The transient message should 'disappear' quickly, then the next pop up (the payment page) appears.
+            setTimeout(() => {
+                transientMessage.classList.remove('show');
 
-        <div style="height:14px"></div>
-        <div style="text-align:center">
-          <button type="submit" id="submitBtn">SUBMIT 👇</button>
-        </div>
-        <div class="final-note">Note: This demo stores submissions in your browser only (localStorage). Replace the marked section to send to email/server.</div>
-      </form>
-    </div>
-  </div>
+                // 3. Show the Payment Page (Page 2)
+                showPage(2);
+            }, 2000); // Show success message for 2 seconds
+        }
 
-  <!-- OVERLAY / MODALS -->
-  <div id="overlay" class="overlay">
-    <div class="modal" id="modalContent">
-      <!-- dynamic content -->
-    </div>
-  </div>
+        /**
+         * Step 2: Handle submission of the payment receipt.
+         * @param {Event} e - The form submission event.
+         */
+        function handleSubmitPage2(e) {
+            e.preventDefault();
 
-<script>
-  // ====== Quick landing behavior ========
-  const landing = document.getElementById('landing');
-  const mainPage = document.getElementById('mainPage');
-  const overlay = document.getElementById('overlay');
-  const modalContent = document.getElementById('modalContent');
+            // Simulate receipt processing (in a real app, this would be an API call)
+            const receiptFile = document.getElementById('paymentReceipt').files[0];
 
-  // Landing: auto-transition quickly (0.9s) but allow immediate Continue
-  let landingTimeout = setTimeout(()=> showMain(), 900);
+            if (!receiptFile) {
+                console.error("Please upload a payment receipt.");
+                return;
+            }
 
-  document.getElementById('landingContinue').addEventListener('click', ()=> {
-    clearTimeout(landingTimeout);
-    showMain();
-  });
-  document.getElementById('landingSkip').addEventListener('click', ()=> {
-    clearTimeout(landingTimeout);
-    showMain();
-  });
+            console.log('Payment Receipt Submitted (Simulated)', {
+                filename: receiptFile.name,
+                size: receiptFile.size,
+                type: receiptFile.type
+            });
 
-  function showMain(){
-    landing.style.display='none';
-    mainPage.style.display='block';
-  }
+            // 4. Go to the Final Confirmation Page (Page 3)
+            showPage(3);
+        }
 
-  // ====== Registration form handling (client-only demo) ======
-  const regForm = document.getElementById('regForm');
+        /**
+         * Utility to copy the bitcoin address to the clipboard.
+         */
+        function copyBitcoinAddress() {
+            const address = document.getElementById('bitcoinAddress').textContent.trim();
+            // Use document.execCommand('copy') for better compatibility in iFrames
+            const tempInput = document.createElement('textarea');
+            tempInput.value = address;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
 
-  regForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    // collect form data (files are NOT sent anywhere in this demo)
-    const fd = new FormData(regForm);
-    const entry = {};
-    for (const [k,v] of fd.entries()){
-      if (v instanceof File){
-        entry[k] = v.name || '(file)'; // do not read file content in demo
-      } else entry[k] = v;
-    }
-    entry.at = new Date().toISOString();
-
-    // store demo entry locally
-    const DBKEY = 'starfan_demo_entries_v1';
-    let db = JSON.parse(localStorage.getItem(DBKEY) || '[]');
-    db.push(entry);
-    localStorage.setItem(DBKEY, JSON.stringify(db));
-
-    // Show "Congratulations" modal that disappears, then popup to proceed
-    showTemporaryCongrats(() => {
-      showProceedToSchedule();
-    });
-
-    // === OPTIONAL: send form to email/service ===
-    // If you want to send to an email, replace the code below with your Formspree or EmailJS endpoint.
-    // For example, to use Formspree:
-    // fetch("https://formspree.io/f/YOUR_FORMSPREE_ENDPOINT", { method: "POST", body: fd })
-    //   .then(r => /* check r.ok etc. */ )
-    //
-    // 🔹 PLACE TO ADD EMAIL ENDPOINT → REPLACE BELOW WITH YOUR CODE:
-    //   (Currently commented out to keep demo safe)
-    /*
-    try {
-      const res = await fetch("https://formspree.io/f/YOUR_FORMSPREE_ENDPOINT", {
-        method: 'POST',
-        body: fd,
-      });
-      console.log('Email submit result', res.status);
-    } catch(err){ console.error('Email send failed', err); }
-    */
-  });
-
-  // temporary congrats modal (disappears)
-  function showTemporaryCongrats(onAfter){
-    overlay.style.display='flex';
-    modalContent.innerHTML = `
-      <div style="text-align:center">
-        <h2>🎉 Congratulations</h2>
-        <p>Your details have been submitted successfully.</p>
-      </div>
-    `;
-    // disappear after 1.6s then call onAfter
-    setTimeout(()=> {
-      overlay.style.display='none';
-      if (onAfter) onAfter();
-    }, 1600);
-  }
-
-  // second popup: proceed to access tour schedule
-  function showProceedToSchedule(){
-    overlay.style.display='flex';
-    modalContent.innerHTML = `
-      <div>
-        <h2>Kindly proceed to access the tour schedule.</h2>
-        <div style="margin-top:12px;display:flex;gap:10px;justify-content:flex-end">
-          <button id="closeProceed" class="close">Cancel</button>
-          <button id="proceedBtn" style="background:var(--accent);color:#071017;padding:8px 12px;border-radius:8px;border:none">Proceed</button>
-        </div>
-      </div>
-    `;
-    document.getElementById('closeProceed').addEventListener('click', ()=> { overlay.style.display='none'; });
-    document.getElementById('proceedBtn').addEventListener('click', ()=> {
-      overlay.style.display='none';
-      openPaymentForm();
-    });
-  }
-
-  // Payment form / Tour schedule access (mock)
-  function openPaymentForm(){
-    overlay.style.display='flex';
-    modalContent.innerHTML = `
-      <div>
-        <h1 style="margin:0 0 6px">Congratulations — your registration is Successful</h1>
-        <h2 style="margin:0 0 12px;color:var(--muted)">Kindly proceed to access the tour schedule.</h2>
-
-        <div style="background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;margin-bottom:12px">
-          <h3 style="margin:0 0 6px;color:var(--accent)">Proceed 👇</h3>
-          <p class="small">Access Fee: <strong>$162</strong> (demo)</p>
-          <p class="small">Please make payment to your verified merchant account. <strong>Do not</strong> send payment to unknown addresses in live projects.</p>
-
-          <label class="small">Provide payment receipt (mock upload)</label>
-          <input id="receipt" type="file" accept="image/*" />
-        </div>
-
-        <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button id="cancelPay" class="close">Cancel</button>
-          <button id="confirmPay" style="background:var(--accent);color:#071017;padding:8px 12px;border-radius:8px;border:none">CONFIRM</button>
-        </div>
-      </div>
-    `;
-
-    document.getElementById('cancelPay').addEventListener('click', ()=> overlay.style.display='none');
-    document.getElementById('confirmPay').addEventListener('click', ()=> {
-      // In demo: we do not verify real payment. Just show final confirmation.
-      overlay.style.display='none';
-      showFinalConfirmation();
-    });
-  }
-
-  function showFinalConfirmation(){
-    overlay.style.display='flex';
-    modalContent.innerHTML = `
-      <div style="text-align:center">
-        <h2 style="color:var(--accent)">CONGRATULATIONS</h2>
-        <p>Kindly check your email for your access details.</p>
-        <div style="height:12px"></div>
-        <button id="doneBtn" style="background:var(--accent);padding:8px 12px;border-radius:8px;border:none;color:#071017">Done</button>
-      </div>
-    `;
-    document.getElementById('doneBtn').addEventListener('click', ()=> {
-      overlay.style.display='none';
-      // optionally redirect or reset form
-      regForm.reset();
-    });
-  }
-
-  // Helper — load demo DB (optional)
-  (function loadDemo(){
-    // nothing to do — page ready
-  })();
-</script>
+            // Show copied message
+            const msg = document.getElementById('copyMessage');
+            msg.classList.remove('hidden');
+            setTimeout(() => {
+                msg.classList.add('hidden');
+            }, 1500);
+        }
+    </script>
 </body>
 </html>
