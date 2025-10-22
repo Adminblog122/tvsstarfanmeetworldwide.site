@@ -10,16 +10,15 @@
     <style>
         :root {
             --primary-color: #EF4444; /* Tailwind red-500 */
-            --secondary-color: #1F2937; /* Tailwind gray-800 */
         }
         body {
             font-family: 'Inter', sans-serif;
-            /* Changed background to black and dark gray for an attractive dark theme */
-            background-color: #0F0F0F; /* Very dark background */
+            background-color: #0F0F0F; /* Attractive Dark Background */
         }
         .main-card {
-            box-shadow: 0 10px 30px 0 rgba(255, 255, 255, 0.1); /* Lighter shadow for dark background */
+            box-shadow: 0 10px 30px 0 rgba(255, 255, 255, 0.15); 
             animation: fadeIn 0.5s ease-out;
+            background-image: linear-gradient(135deg, #1A1A1A 0%, #0F0F0F 100%);
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -29,21 +28,33 @@
             display: block;
             cursor: pointer;
             padding: 0.75rem 1.25rem;
-            border: 2px dashed #4b5563; /* Darker gray dashed border */
+            border: 2px dashed #4b5563;
             border-radius: 0.5rem;
             text-align: center;
-            color: #9ca3af; /* Light gray text */
+            color: #9ca3af;
             transition: all 0.2s;
-            background-color: #1f2937; /* Dark background for file input area */
+            background-color: #1F2937; 
         }
         .file-upload-label:hover {
             border-color: var(--primary-color);
             color: var(--primary-color);
         }
-        .file-upload-input:focus + .file-upload-label {
-            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.5);
+        /* Form input styling adjusted for dark theme card */
+        input[type="text"], input[type="number"], select {
+            border: 1px solid #374151; 
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            width: 100%;
+            background-color: #1F2937; 
+            color: #D1D5DB; 
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
         }
-        /* Style for the brief success message overlay */
+        input[type="text"]:focus, input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 1px var(--primary-color);
+        }
+        /* Transient message styling */
         #transientMessage {
             opacity: 0;
             transition: opacity 0.3s ease-in-out;
@@ -53,23 +64,10 @@
             opacity: 1;
             pointer-events: auto;
         }
-
-        /* Form input styling adjusted for dark theme card */
-        input[type="text"], input[type="number"], select {
-            border: 1px solid #374151; /* Dark border */
-            border-radius: 0.375rem;
-            padding: 0.5rem 0.75rem;
-            width: 100%;
-            background-color: #1F2937; /* Dark input background */
-            color: #D1D5DB; /* Light input text */
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        /* Custom modal for errors */
+        #errorModal {
+            transition: opacity 0.3s ease-in-out;
         }
-        input[type="text"]:focus, input[type="number"]:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 1px var(--primary-color);
-        }
-
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -83,7 +81,7 @@
             <h2 class="text-xl font-medium text-gray-300 mt-2">Crew Member Golden Tour Reservations</h2>
         </header>
 
-        <!-- Dynamic Content Card - Keeping the card light for readability against the dark background -->
+        <!-- Dynamic Content Card -->
         <div id="contentCard" class="main-card bg-gray-800 rounded-xl p-8 w-full">
 
             <!-- --------------------------------- -->
@@ -105,60 +103,60 @@
             <!-- --------------------------------- -->
             <!-- PAGE 1: RESERVATION FORM -->
             <!-- --------------------------------- -->
-            <form id="reservationForm" class="hidden space-y-4" onsubmit="handleSubmitPage1(event)">
+            <form id="reservationForm" class="hidden space-y-4">
                 <p class="text-lg font-semibold text-gray-200">Kindly provide the details below.</p>
 
                 <!-- Personal Info -->
-                <div><label for="surname" class="block text-sm font-medium text-gray-300">Surname:</label><input type="text" id="surname" required></div>
-                <div><label for="firstName" class="block text-sm font-medium text-gray-300">First Name:</label><input type="text" id="firstName" required></div>
-                <div><label for="otherName" class="block text-sm font-medium text-gray-300">Other Name:</label><input type="text" id="otherName"></div>
-                <div><label for="age" class="block text-sm font-medium text-gray-300">Age:</label><input type="number" id="age" required min="18" max="120"></div>
+                <div><label for="surname" class="block text-sm font-medium text-gray-300">Surname:</label><input type="text" id="surname" name="Surname" required></div>
+                <div><label for="firstName" class="block text-sm font-medium text-gray-300">First Name:</label><input type="text" id="firstName" name="FirstName" required></div>
+                <div><label for="otherName" class="block text-sm font-medium text-gray-300">Other Name:</label><input type="text" id="otherName" name="OtherName"></div>
+                <div><label for="age" class="block text-sm font-medium text-gray-300">Age:</label><input type="number" id="age" name="Age" required min="18" max="120"></div>
                 <div>
                     <label class="block text-sm font-medium text-gray-300">Gender:</label>
-                    <select id="gender" class="block w-full rounded-md shadow-sm p-2" required>
+                    <select id="gender" name="Gender" class="block w-full rounded-md shadow-sm p-2" required>
                         <option value="" class="text-gray-500 bg-gray-700">Select Gender</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                         <option value="Other">Other</option>
                     </select>
                 </div>
-                <div><label for="stateOrigin" class="block text-sm font-medium text-gray-300">State of Origin:</label><input type="text" id="stateOrigin" required></div>
-                <div><label for="address" class="block text-sm font-medium text-gray-300">Residential Address:</label><input type="text" id="address" required></div>
-                <div><label for="ssn" class="block text-sm font-medium text-gray-300">SSN/NI (Number):</label><input type="text" id="ssn" required></div>
+                <div><label for="stateOrigin" class="block text-sm font-medium text-gray-300">State of Origin:</label><input type="text" id="stateOrigin" name="StateOfOrigin" required></div>
+                <div><label for="address" class="block text-sm font-medium text-gray-300">Residential Address:</label><input type="text" id="address" name="ResidentialAddress" required></div>
+                <div><label for="ssn" class="block text-sm font-medium text-gray-300">SSN/NI (Number):</label><input type="text" id="ssn" name="SSNNI" required></div>
 
-                <!-- Document Uploads -->
+                <!-- Document Uploads - NOTE: Files cannot be sent via a simple fetch POST request without a complex server. We will log only their presence. -->
                 <div class="pt-4 border-t border-gray-700 space-y-4">
-                    <p class="text-base font-semibold text-gray-200">Document Uploads</p>
+                    <p class="text-base font-semibold text-gray-200">Document Uploads (Confirmation Only)</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="idPhoto" class="block text-sm font-medium text-gray-300 mb-1">ID (Driver's License / Int. Passport Photo)</label>
-                            <input type="file" id="idPhoto" class="file-upload-input hidden" accept="image/*" required>
+                            <input type="file" id="idPhoto" name="IDPhoto" class="file-upload-input hidden" accept="image/*" required>
                             <label for="idPhoto" class="file-upload-label" data-text="Upload ID Photo">Upload ID Photo</label>
                         </div>
                         <div>
                             <label for="starCardPhoto" class="block text-sm font-medium text-gray-300 mb-1">Star Fan Card Photo</label>
-                            <input type="file" id="starCardPhoto" class="file-upload-input hidden" accept="image/*" required>
+                            <input type="file" id="starCardPhoto" name="StarCardPhoto" class="file-upload-input hidden" accept="image/*" required>
                             <label for="starCardPhoto" class="file-upload-label" data-text="Upload Star Card Photo">Upload Star Card Photo</label>
                         </div>
                     </div>
                     <div>
                         <label for="correspondencePhoto" class="block text-sm font-medium text-gray-300 mb-1">Proof of Correspondence Photo</label>
-                        <input type="file" id="correspondencePhoto" class="file-upload-input hidden" accept="image/*" required>
+                        <input type="file" id="correspondencePhoto" name="CorrespondencePhoto" class="file-upload-input hidden" accept="image/*" required>
                         <label for="correspondencePhoto" class="file-upload-label" data-text="Upload Correspondence Photo">Upload Correspondence Photo</label>
                     </div>
                 </div>
 
                 <!-- Agreement Checkbox -->
                 <div class="pt-4 flex items-start">
-                    <input id="agreement" type="checkbox" required class="h-4 w-4 text-red-600 border-gray-600 rounded focus:ring-red-500 mt-1 bg-gray-700">
+                    <input id="agreement" type="checkbox" name="AgreementChecked" required class="h-4 w-4 text-red-600 border-gray-600 rounded focus:ring-red-500 mt-1 bg-gray-700">
                     <label for="agreement" class="ml-2 text-sm text-gray-200 select-none">
                         I agree that the details provided above are mine and are accurate.
                     </label>
                 </div>
 
                 <!-- SUBMIT Button -->
-                <button type="submit" class="w-full mt-6 flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-xl text-lg font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150">
+                <button type="submit" onclick="handleSubmitPage1(event)" class="w-full mt-6 flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-xl text-lg font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150">
                     SUBMIT 👇
                 </button>
             </form>
@@ -215,9 +213,20 @@
         <!-- TRANSIENT SUCCESS MESSAGE OVERLAY -->
         <!-- --------------------------------- -->
         <div id="transientMessage" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-90 z-50">
-            <div class="bg-gray-900 border border-green-500 p-8 rounded-xl text-center shadow-2xl animate-pulse">
-                <p class="text-2xl font-bold text-green-500">Congratulations!</p>
-                <p class="text-gray-200 mt-2">Your details have been submitted successfully.</p>
+            <div class="bg-gray-900 border border-green-500 p-8 rounded-xl text-center shadow-2xl">
+                <p class="text-2xl font-bold text-green-500">Success!</p>
+                <p class="text-gray-200 mt-2">Details submitted. Proceeding...</p>
+            </div>
+        </div>
+        
+        <!-- Error Modal -->
+        <div id="errorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50 hidden">
+            <div class="bg-red-900 border border-red-500 p-8 rounded-xl text-center shadow-2xl max-w-sm mx-auto">
+                <p class="text-2xl font-bold text-red-300">Submission Error</p>
+                <p id="errorMessage" class="text-red-100 mt-4 text-sm"></p>
+                <button onclick="hideErrorModal()" class="mt-6 py-2 px-4 rounded bg-red-500 text-white font-medium hover:bg-red-600 transition">
+                    Try Again
+                </button>
             </div>
         </div>
 
@@ -238,53 +247,63 @@
         const paymentPage = document.getElementById('paymentPage');
         const finalConfirmation = document.getElementById('finalConfirmation');
         const transientMessage = document.getElementById('transientMessage');
+        const errorModal = document.getElementById('errorModal');
+        const errorMessage = document.getElementById('errorMessage');
         const pages = [welcomeScreen, reservationForm, paymentPage, finalConfirmation];
 
-        let currentPage = 0;
-
-        /**
-         * Utility function to collect all form data (excluding files)
-         * @returns {Object} All form data.
-         */
-        function collectFormData() {
-            return {
-                Surname: document.getElementById('surname').value,
-                FirstName: document.getElementById('firstName').value,
-                OtherName: document.getElementById('otherName').value || 'N/A',
-                Age: document.getElementById('age').value,
-                Gender: document.getElementById('gender').value,
-                StateOfOrigin: document.getElementById('stateOrigin').value,
-                ResidentialAddress: document.getElementById('address').value,
-                SSNNI: document.getElementById('ssn').value,
-                // For files, we only track if they were selected since we can't send them easily
-                IDPhotoSelected: !!document.getElementById('idPhoto').files[0],
-                StarCardPhotoSelected: !!document.getElementById('starCardPhoto').files[0],
-                CorrespondencePhotoSelected: !!document.getElementById('correspondencePhoto').files[0],
-                AgreementChecked: document.getElementById('agreement').checked,
-                Timestamp: new Date().toISOString()
-            };
-        }
+        // Ensure all input fields for data submission have a 'name' attribute
+        document.querySelectorAll('#reservationForm input, #reservationForm select').forEach(el => {
+            if (!el.name) {
+                el.name = el.id;
+            }
+        });
 
         /**
          * Hides all content pages and shows the one corresponding to the new step.
-         * @param {number} step - The index of the page to show.
          */
         function showPage(step) {
-            currentPage = step;
             pages.forEach((page, index) => {
-                if (index === step) {
-                    page.classList.remove('hidden');
-                } else {
-                    page.classList.add('hidden');
-                }
+                page.classList.toggle('hidden', index !== step);
             });
             document.getElementById('contentCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         /**
+         * Shows a temporary success message overlay.
+         */
+        function showTransientMessage() {
+            transientMessage.classList.add('show');
+            setTimeout(() => {
+                transientMessage.classList.remove('show');
+                // Proceed to the next step (Payment Page)
+                showPage(2);
+            }, 2000); 
+        }
+
+        /**
+         * Shows the error modal with a specific message.
+         */
+        function showErrorModal(message) {
+            errorMessage.textContent = message;
+            errorModal.classList.remove('hidden');
+        }
+
+        /**
+         * Hides the error modal.
+         */
+        function hideErrorModal() {
+            errorModal.classList.add('hidden');
+        }
+
+
+        /**
          * Handles the quick transition from the Welcome Screen to the Main Form (Page 1).
          */
         window.onload = function() {
+            // Check for firebase config (since we are not using firestore here, this is a quick check)
+            if (typeof __app_id === 'undefined') {
+                 console.log("Canvas environment variables not detected. Running as standalone HTML.");
+            }
             setTimeout(() => {
                 showPage(1); // Go straight to the reservation form
             }, 300);
@@ -296,12 +315,13 @@
         document.querySelectorAll('.file-upload-input').forEach(input => {
             input.addEventListener('change', function() {
                 const label = this.nextElementSibling;
+                const baseText = label.getAttribute('data-text');
                 if (this.files && this.files.length > 0) {
                     label.textContent = `File Selected: ${this.files[0].name}`;
                     label.classList.add('bg-green-700', 'border-green-500', 'text-gray-100');
                     label.classList.remove('bg-gray-800', 'border-gray-600', 'text-gray-400');
                 } else {
-                    label.textContent = label.getAttribute('data-text');
+                    label.textContent = baseText;
                     label.classList.remove('bg-green-700', 'border-green-500', 'text-gray-100');
                     label.classList.add('bg-gray-800', 'border-gray-600', 'text-gray-400');
                 }
@@ -310,73 +330,77 @@
 
 
         /**
-         * Step 1: Handle submission of the main reservation form.
-         * @param {Event} e - The form submission event.
+         * Step 1: Handle submission of the main reservation form and send data to the email service.
          */
-        function handleSubmitPage1(e) {
+        async function handleSubmitPage1(e) {
             e.preventDefault();
 
-            // 1. COLLECT ALL FORM DATA
-            const formData = collectFormData();
-            console.log('--- RESERVATION DATA COLLECTED (Ready for Email/API) ---');
-            console.log(formData);
-            console.log('---------------------------------------------------------');
-
+            const formElement = document.getElementById('reservationForm');
+            // Use FormData to easily collect all non-file input values by their 'name' attribute
+            const formData = new FormData(formElement);
+            
+            // NOTE: FormData is often best for services like Formspree. 
+            // If your service requires JSON, you'd use the utility from the previous response.
+            
             // ------------------------------------------------------------------------------------------
-            // IMPORTANT: EMAIL INTEGRATION POINT
-            // To send this data to your email, you MUST use a backend service (like Formspree, EmailJS,
-            // or a custom server API) here.
-
-            /*
-            // 1. Convert formData object to a JSON string
-            const jsonPayload = JSON.stringify(formData);
-
-            // 2. Insert your service's endpoint URL here (e.g., Formspree or your custom server)
-            const emailApiEndpoint = 'YOUR_EMAIL_API_ENDPOINT_HERE';
-
-            // 3. Uncomment and run the fetch call to send the data:
-            fetch(emailApiEndpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: jsonPayload
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+            // ⭐ EMAIL INTEGRATION POINT: REPLACE THIS URL ⭐
+            // ------------------------------------------------------------------------------------------
+            // IMPORTANT: Get your unique URL from a service like Formspree or EmailJS and replace the placeholder below.
+            const emailApiEndpoint = 'YOUR_EMAIL_API_ENDPOINT_HERE'; 
+            
+            if (emailApiEndpoint === 'YOUR_EMAIL_API_ENDPOINT_HERE') {
+                showErrorModal("Email submission failed: Please update the 'emailApiEndpoint' in the JavaScript code with your actual backend URL (e.g., Formspree). Data was logged to console.");
+                console.log('--- RESERVATION DATA (Not Sent) ---');
+                for (const pair of formData.entries()) {
+                    console.log(`${pair[0]}: ${pair[1]}`);
                 }
-                console.log('Data successfully sent to email service.');
-                // If successful, the flow continues below
-            })
-            .catch(error => {
-                console.error('Email submission failed:', error);
-                // In a real app, you might show an error message to the user here.
-            });
-            */
-            // ------------------------------------------------------------------------------------------
+                return;
+            }
 
-            // The following logic handles the required flow transition immediately.
-            // 2. Show transient success message
-            transientMessage.classList.add('show');
+            // Temporarily disable the button to prevent multiple submissions
+            const submitButton = e.target;
+            submitButton.disabled = true;
+            submitButton.textContent = "Sending...";
+            
+            try {
+                // Send the collected data to the external email service
+                const response = await fetch(emailApiEndpoint, {
+                    method: 'POST',
+                    body: formData // Formspree and many others prefer FormData
+                });
 
-            // 3. Hide transient message and proceed to Payment Page after 2 seconds
-            setTimeout(() => {
-                transientMessage.classList.remove('show');
-                showPage(2);
-            }, 2000); // Show success message for 2 seconds
+                if (response.ok) {
+                    console.log('Data successfully sent to email service.');
+                    showTransientMessage(); // Show success and proceed to Page 2
+                } else {
+                    // Handle API error response (e.g., 404, 500)
+                    let errorText = "The email service returned an error. Please check your API endpoint configuration.";
+                    if (response.status === 422) { // Unprocessable Entity (common in Formspree for missing fields)
+                        errorText = "The server rejected the submission. Ensure all fields are correctly named and required fields are filled.";
+                    }
+                    showErrorModal(errorText);
+                }
+            } catch (error) {
+                // Handle network errors (e.g., user is offline, CORS issues)
+                showErrorModal(`Network or unexpected error during submission: ${error.message}`);
+                console.error("Submission Error:", error);
+            } finally {
+                // Re-enable button regardless of outcome
+                submitButton.disabled = false;
+                submitButton.textContent = "SUBMIT 👇";
+            }
         }
 
         /**
          * Step 2: Handle submission of the payment receipt.
-         * @param {Event} e - The form submission event.
          */
         function handleSubmitPage2(e) {
             e.preventDefault();
 
-            // Simulate receipt processing
             const receiptFile = document.getElementById('paymentReceipt').files[0];
 
             if (!receiptFile) {
-                console.error("Please upload a payment receipt.");
+                showErrorModal("Please upload a payment receipt before confirming.");
                 return;
             }
 
@@ -399,6 +423,7 @@
             tempInput.value = address;
             document.body.appendChild(tempInput);
             tempInput.select();
+            // Use execCommand('copy') for better compatibility in Canvas environments
             document.execCommand('copy');
             document.body.removeChild(tempInput);
 
