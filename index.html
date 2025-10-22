@@ -325,25 +325,36 @@
             // ------------------------------------------------------------------------------------------
             // IMPORTANT: EMAIL INTEGRATION POINT
             // To send this data to your email, you MUST use a backend service (like Formspree, EmailJS,
-            // or a custom server API) here. An example structure would look like this:
+            // or a custom server API) here.
+
             /*
-            fetch('YOUR_EMAIL_API_ENDPOINT', {
+            // 1. Convert formData object to a JSON string
+            const jsonPayload = JSON.stringify(formData);
+
+            // 2. Insert your service's endpoint URL here (e.g., Formspree or your custom server)
+            const emailApiEndpoint = 'YOUR_EMAIL_API_ENDPOINT_HERE';
+
+            // 3. Uncomment and run the fetch call to send the data:
+            fetch(emailApiEndpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                body: jsonPayload
             })
             .then(response => {
-                // If successful, proceed with the flow below
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                console.log('Data successfully sent to email service.');
+                // If successful, the flow continues below
             })
             .catch(error => {
                 console.error('Email submission failed:', error);
-                // Handle error (maybe show an error message instead of success)
+                // In a real app, you might show an error message to the user here.
             });
             */
-            // The following logic handles the required flow transition immediately.
             // ------------------------------------------------------------------------------------------
 
-
+            // The following logic handles the required flow transition immediately.
             // 2. Show transient success message
             transientMessage.classList.add('show');
 
